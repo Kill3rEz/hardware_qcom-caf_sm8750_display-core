@@ -48,6 +48,7 @@
 
 #include "concurrency_mgr.h"
 #include "ipc_impl.h"
+#include "oplus_cwb_proxy.h"
 #include "sdm_debugger.h"
 
 #define __CLASS__ "ConcurrencyMgr"
@@ -247,6 +248,11 @@ void ConcurrencyMgr::PostInit() {
   // This avoids deadlock between composer and its clients.
   auto sdm_display = sdm_display_[SDM_DISPLAY_PRIMARY];
   sdm_display->PostInit();
+
+  // Stock ColorOS: CwbProxy::initialize() from ConcurrencyMgr::Init so
+  // ICwbService + DisplayConfig CWB share the composer process. CAF never
+  // calls into libcwb_qcom_aidl; do it here once IDisplayConfig is registered.
+  InitOplusCwbProxy();
 }
 
 DisplayError ConcurrencyMgr::Deinit() {
@@ -1111,6 +1117,10 @@ DisplayError ConcurrencyMgr::SetPowerMode(uint64_t display, int32_t int_mode) {
     // Trigger one more refresh for PP features to take effect.
     pending_refresh_.set(UINT32(display));
   }
+
+  // Stock ColorOS: ConcurrencyMgr::SetPowerMode -> CwbProxy::setPowerMode so
+  // getRGBValue does not early-out on "Screen power off".
+  OplusCwbSetPowerMode(display, INT32(mode));
 
   DTRACE_END();
   return kErrorNone;

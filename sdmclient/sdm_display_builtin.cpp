@@ -42,6 +42,7 @@
 #include <vector>
 
 #include "concurrency_mgr.h"
+#include "oplus_cwb_proxy.h"
 #include "sdm_color_mode_stc.h"
 #include "sdm_debugger.h"
 #include "sdm_display_builtin.h"
@@ -506,6 +507,8 @@ SDMDisplayBuiltIn::SetColorModeWithRenderIntent(SDMColorMode mode,
     return status;
   }
   callbacks_->OnRefresh(id_);
+  // Stock: SetColorModeWithRenderIntent → CwbProxy::notifyColorModeChange.
+  OplusCwbNotifyColorModeChange(id_, INT32(mode), INT32(intent));
   return status;
 }
 

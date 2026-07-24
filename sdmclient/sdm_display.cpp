@@ -53,6 +53,7 @@
 #include <vector>
 
 #include "concurrency_mgr.h"
+#include "oplus_cwb_proxy.h"
 #include "sdm_debugger.h"
 #include "sdm_display.h"
 #include "sdm_display_resolution_extn.h"
@@ -1438,6 +1439,9 @@ DisplayError SDMDisplay::SetActiveConfig(Config config) {
   // Trigger refresh. This config gets applied on next commit.
   callbacks_->OnRefresh(id_);
 
+  // Stock: SDMDisplay::NotifyConfigChanged → CwbProxy::notifyConfigChange.
+  OplusCwbNotifyConfigChange(id_, UINT32(config));
+
   return kErrorNone;
 }
 
@@ -2032,6 +2036,10 @@ SDMDisplay::PostCommitLayerStack(shared_ptr<Fence> *out_retire_fence) {
     pending_first_commit_config_ = false;
     SetActiveConfig(pending_first_commit_config_index_);
   }
+
+  // Stock ColorOS: PostCommitLayerStack → CwbProxy::invalidCache every frame so
+  // getCwbValue's WaitForLayerChange wakes and the RGB cache is not sticky-zero.
+  OplusCwbInvalidCache();
 
   return status;
 }

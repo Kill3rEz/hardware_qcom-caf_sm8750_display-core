@@ -20,6 +20,7 @@ cc_library_shared {
         "libsdmutils",
         "libdrm",
         "libtinyxml2",
+        "liblog",
     ],
     cflags: [
         "-DLOG_TAG=\"SDM\"",
@@ -30,5 +31,4 @@ cc_library_shared {
     ],
 
     srcs: ["*.cpp"],
-
 }
