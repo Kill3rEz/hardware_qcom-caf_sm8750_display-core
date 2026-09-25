@@ -20,6 +20,12 @@ cc_library_headers {
       "display_debug_headers",
       "common_interface_headers",
       "snapalloc_interface_headers",
+      // PenguinOS/dodge: the display uapi kernel headers (display/drm/*.h such as
+      // sde_drm.h and msm_drm_aiqe.h) come from the qti_display_kernel_headers
+      // genrule in kernel/oneplus/sm8750-modules; re-export them here so every
+      // display module that pulls display_core_headers/display_headers (e.g.
+      // libdrmutils, which only lists qti_kernel_headers) resolves them.
+      "qti_display_kernel_headers",
   ],
   export_header_lib_headers: [
       "libhardware_headers",
@@ -27,5 +33,6 @@ cc_library_headers {
       "display_debug_headers",
       "common_interface_headers",
       "snapalloc_interface_headers",
+      "qti_display_kernel_headers",
   ],
 }
